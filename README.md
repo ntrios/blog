@@ -1,48 +1,144 @@
-# CakePHP
+# Blog Test
+Following the proposed test, this repository aims to create an MVP of a blog based on the tutorial described on the official website of the [`CakePHP 2.x`](https://book.cakephp.org/2/en/tutorials-and-examples/blog/blog.html) framework.
 
-[![Latest Stable Version](https://poser.pugx.org/cakephp/cakephp/v/stable.svg)](https://packagist.org/packages/cakephp/cakephp)
-[![License](https://poser.pugx.org/cakephp/cakephp/license.svg)](https://packagist.org/packages/cakephp/cakephp)
-[![Bake Status](https://secure.travis-ci.org/cakephp/cakephp.png?branch=master)](https://travis-ci.org/cakephp/cakephp)
-[![Code consistency](https://squizlabs.github.io/PHP_CodeSniffer/analysis/cakephp/cakephp/grade.svg)](https://squizlabs.github.io/PHP_CodeSniffer/analysis/cakephp/cakephp/)
+## Table of Contents
 
-CakePHP is a rapid development framework for PHP which uses commonly known design patterns like Active Record, Association Data Mapping, Front Controller and MVC.
-Our primary goal is to provide a structured framework that enables PHP users at all levels to rapidly develop robust web applications, without any loss to flexibility.
+- [Database](#database)
+- [Built With](#built-with)
+- [Getting Started](#getting-started)
+- [Endpoints](#endpoints)
+- [Testing](#testing)
 
+## Database
+Based on these instructions, I built: ![`eer diagram`](.github/blog-database.png)
 
-## Some Handy Links
+## Built With
+- PHP 7.4.9
+- MySql 5.7.30
 
-[CakePHP](https://cakephp.org) - The rapid development PHP framework
+## Getting Started
+### Git
+You can also clone the repository using git: `https://github.com/ntrios/blog.git`
 
-[CookBook](https://book.cakephp.org) - THE CakePHP user documentation; start learning here!
+### Install dependencies
+Now in a terminal, inside the project folder install the dependencies: `php composer.phar install`
 
-[API](https://api.cakephp.org) - A reference to CakePHP's classes
+### Configure database
+Make a copy of `/app/Config/database.php.default` in the same directory, but name it `database.php`.
 
-[Plugins](https://plugins.cakephp.org) - A repository of extensions to the framework
+You must create a database and replace the values in the `$default` array with those that apply to your setup.
 
-[The Bakery](https://bakery.cakephp.org) - Tips, tutorials and articles
+```php
+	public $default = array(
+		'datasource' => 'Database/Mysql',
+		'persistent' => false,
+		'host' => 'localhost',
+		'port' => 'port_number',
+		'login' => 'user',
+		'password' => 'password',
+		'database' => 'database_name',
+		'prefix' => '',
+	);
+```
+### Create tables
+```sql
+CREATE TABLE posts (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    body TEXT NOT NULL,
+    likes INT NOT NULL DEFAULT 0,
+    is_published TINYINT NOT NULL DEFAULT 0,
+    created DATETIME DEFAULT NULL,
+    modified DATETIME DEFAULT NULL
+);
+```
+```sql
+CREATE TABLE users (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(254) NOT NULL,
+    email VARCHAR(200) UNIQUE,
+    created DATETIME DEFAULT NULL,
+    modified DATETIME DEFAULT NULL
+);
+```
+```sql
+CREATE TABLE comments (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNSIGNED,
+    post_id INT UNSIGNED,
+    body TEXT NOT NULL,
+    created DATETIME DEFAULT NULL,
+    modified DATETIME DEFAULT NULL
+);
 
-[Community Center](https://community.cakephp.org) - A source for everything community related
+ALTER TABLE `comments` ADD CONSTRAINT `fk_comments_users` FOREIGN KEY ( `user_id` ) REFERENCES `users` ( `id` ) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `comments` ADD CONSTRAINT `fk_comments_posts` FOREIGN KEY ( `post_id` ) REFERENCES `posts` ( `id` ) ON DELETE SET NULL ON UPDATE CASCADE;
+```
+### Populating database
+```sql
+INSERT INTO posts (id, title, body, created)
+    VALUES (1, 'First Post', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', NOW());
+INSERT INTO posts (id, title, body, created)
+    VALUES (2, 'Second Post', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', NOW());
+INSERT INTO posts (id, title, body, created)
+    VALUES (3, 'Third Post', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', NOW());
+```
 
-[Training](https://training.cakephp.org) - Join a live session and get skilled with the framework
+```sql
+INSERT INTO users (id, name, email, created)
+    VALUES (1, 'User 1', 'user1@email.com', NOW());
+INSERT INTO users (id, name, email, created)
+    VALUES (2, 'User 2', 'user2@email.com', NOW());
+INSERT INTO users (id, name, email, created)
+    VALUES (3, 'User 3', 'user3@email.com', NOW());
+```
 
-[CakeFest](https://cakefest.org) - Don't miss our annual CakePHP conference
+```sql
+INSERT INTO comments (id, user_id, post_id, body, created)
+	VALUES (1, 1, 1, 'Comment 1.', NOW());
+INSERT INTO comments (id, user_id, post_id, body, created)
+	VALUES (2, 2, 1, 'Comment 2.', NOW());
+INSERT INTO comments (id, user_id, post_id, body, created)
+	VALUES (3, 1, 1, 'Comment 3.', NOW());
+INSERT INTO comments (id, user_id, post_id, body, created)
+	VALUES (4, 3, 3, 'Comment 4.', NOW());
+INSERT INTO comments (id, user_id, post_id, body, created)
+	VALUES (5, 2, 3, 'Comment 5.', NOW());
+```
 
-[Cake Software Foundation](https://cakefoundation.org) - Promoting development related to CakePHP
+## Endpoints
+After you have done all of the above, and started the application, you will be able to visit the following endpoints:
+- ```/posts/```
+- ```/posts/add```
+- ```/posts/edit/{post_id}```
+- ```/posts/view/{post_id}```
+- ```/users/```
+- ```/users/add```
+- ```/users/edit/{post_id}```
+- ```/users/view/{post_id}```
 
+## Testing
+I also prepared a simple unit test with PHPUnit. Just testing if the application will not allow the creation of a post if any mandatory field is empty.
 
-## Get Support!
+If you ran the dependency installation, PHPUnit is probably installed, otherwise run the following command:
 
-[#cakephp](https://webchat.freenode.net/?channels=#cakephp) on irc.freenode.net - Come chat with us, we have cake
+```php
+php composer.phar require --dev phpunit/phpunit:"4.* || 5.*" --update-with-dependencie
+```
 
-[Google Group](https://groups.google.com/group/cake-php) - Community mailing list and forum
+You must create a new database and replace the values in the `$test` array in `/app/Config/database.php` with those that apply to your setup.
 
-[GitHub Issues](https://github.com/cakephp/cakephp/issues) - Got issues? Please tell us!
+```php
+public $test = array(
+	'datasource' => 'Database/Mysql',
+	'persistent' => false,
+	'host' => 'localhost',
+	'login' => 'user',
+	'password' => 'password',
+	'database' => 'test_database_name',
+	'prefix' => '',
+	//'encoding' => 'utf8',
+);
+```
 
-[Roadmaps](https://github.com/cakephp/cakephp/wiki#roadmaps) - Want to contribute? Get involved!
-
-
-## Contributing
-
-[CONTRIBUTING.md](CONTRIBUTING.md) - Quick pointers for contributing to the CakePHP project
-
-[CookBook "Contributing" Section (2.x)](https://book.cakephp.org/2.0/en/contributing.html) [(3.x)](https://book.cakephp.org/3.0/en/contributing.html) - Version-specific details about contributing to the project
+To view the test, visit: `{application_link}/test.php`
