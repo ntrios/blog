@@ -1,10 +1,10 @@
 <h1>Blog - Post</h1>
 
-<h2><?php echo $post['Post']['title']?></h2>
+<h2><?php echo $post['Post']['title'] ?></h2>
 <hr /><br />
 <p><small><i>Created in: <?php echo $post['Post']['created']; ?></i></small></p>
 
-<p><?php echo $post['Post']['body']?></p><br />
+<p><?php echo $post['Post']['body'] ?></p><br />
 
 <h2>Comments</h2>
 <hr /><br />
@@ -22,6 +22,6 @@
 			<td><?php echo $comment['User']['name']; ?></td>
 			<td><?php echo $comment['created']; ?></td>
 		</tr>
-	<?php endforeach; ?>
+	<?php endforeach;?>
 </table>
 

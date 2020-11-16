@@ -14,22 +14,22 @@
         <tr>
             <td><?php echo $user['User']['id']; ?></td>
             <td>
-                <?php echo $this->Html->link($user['User']['name'], array('action' => 'view', $user['User']['id']));?>
+                <?php echo $this->Html->link($user['User']['name'], array('action' => 'view', $user['User']['id'])); ?>
             </td>
             <td>
 				<?php
-                	echo $this->Html->link(
-                    'Edit', array('action' => 'edit', $user['User']['id']));
-				?>
+					echo $this->Html->link(
+						'Edit', array('action' => 'edit', $user['User']['id']));
+					?>
 
                 <?php echo $this->Form->postLink(
-                    'Delete',
-                    array('action' => 'delete', $user['User']['id']),
-                    array('confirm' => 'Are you sure?'));
-                ?>
+					'Delete',
+					array('action' => 'delete', $user['User']['id']),
+					array('confirm' => 'Are you sure?'));
+				?>
             </td>
             <td><?php echo $user['User']['created']; ?></td>
         </tr>
-    <?php endforeach; ?>
+    <?php endforeach;?>
 
 </table>
